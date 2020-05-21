@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Análisis de Componentes Principales</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    MathJax = {
+      tex: {
+        tags: 'ams'  // should be 'ams', 'none', or 'all'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+
+<body>
+
+<h1>Análisis de Componentes Principales</h1>
+
+<!-- ######################################################## -->
+<h2>Autovectores y autovalores</h2>
+<p>
+Para una matriz cuadrada \( \mathbf{A} \), un autovector (o vector propio) \( \mathbf{v} \) y un autovalor (o valor propio) \( \lambda \) cumplen la ecuación
+\begin{equation}
+
+\mathbf{A}\mathbf{v}=\lambda \mathbf{v} \;\ldotp
+
+\end{equation}
+</p>
+<p>
+Esto quiere decir que al aplicar una trasformación (matriz \( \mathbf{A} \)) a un vector \( \mathbf{v} \), el resultado es el mismo vector \( \mathbf{v} \) escalado por un número. Es decir, al aplicar una transformación a un vector, el vector resultante mantiene la dirección del vector original.
+</p>
+<p>
+Toda matriz cuadrada \( \mathbf{A} \) tiene algún autovalor (y, por tanto, algún autovector), aunque este autovalor puede ser un número complejo y no un número real.   
+</p>
+<p>
+Hay que tener en cuenta que cuando se obtienen los autovectores de una matriz por medio de alguna librería computacional, ésta retorna, normalmente, los autovectores nomalizados con módulo 1.
+</p>
+<!-- ######################################################## -->
+
+
+<!-- ######################################################## -->
+<h2>Notación</h2>
+<p>
+Cuando trabajamos con un conjunto de datos, estos vienen, normalmente, en forma de tabla de \( n \) filas por \( p \) columnas. Por lo general, las columnas representan las variables (aleatorias) y las filas representan las realizaciones u observaciones de esas variables. Podemos expresar esa tabla de datos en forma de matriz:
+\begin{equation}
+   
+\mathbf{X}=\left\lbrack \begin{array}{ccccc}
+x_{11}  & \cdots  & x_{1j}  & \cdots  & x_{1p} \\
+\vdots  & \vdots  & \vdots  & \vdots  & \vdots \\
+x_{i1}  & \cdots  & x_{ij}  & \cdots  & x_{ip} \\
+\vdots  & \vdots  & \vdots  & \vdots  & \vdots \\
+x_{n1}  & \cdots  & x_{nj}  & \cdots  & x_{np} 
+\end{array}\right\rbrack
+
+\end{equation}
+</p>
+<p>
+Fijándonos en la matriz anterior, podemos decir que tenemos un cojunto de \( n \) realizaciones:
+\begin{equation}
+
+\left\lbrace \mathbf{x}_{1\cdot}, \cdots, \mathbf{x}_{i\cdot}, \cdots, \mathbf{x}_{n\cdot} \right\rbrace 
+
+\end{equation}
+
+donde cada realización es un vector de \( p \) dimensiones:
+\begin{equation}
+
+\mathbf{x}_{i\cdot}=\left\lbrack \begin{array}{c}
+x_{i1} \\
+\vdots \\
+x_{ij} \\
+\vdots \\
+x_{ip} 
+\end{array}\right\rbrack \in \mathbb{R}^{p}
+
+\end{equation}
+
+en el que cada elemento \( x_{ij} \) es la realización \( i \) de la variable (aleatoria) \( j \).
+</p>
+<!-- ######################################################## -->
+
+
+<!-- ######################################################## -->
+<h2>Matriz de covarianzas</h2>
+<p>
+Dado un conjunto de realizaciones \( \left\lbrace \mathbf{x}_{1\cdot}, \cdots, \mathbf{x}_{i\cdot}, \cdots, \mathbf{x}_{n\cdot} \right\rbrace \) con \( \mathbf{x}_{i\cdot}=\left\lbrack \begin{array}{c} x_{i1} \\ \vdots \\ x_{ij} \\ \vdots \\ x_{ip} \end{array}\right\rbrack \), calculamos las medias de las realizaciones para cada variable y las representamos como un vector \( \mathbf{\overline{x}}=\left\lbrack \begin{array}{c} \overline{x}_{\cdot1} \\ \vdots \\ \overline{x}_{\cdot j} \\ \vdots \\ \overline{x}_{\cdot p} \end{array}\right\rbrack \). La matriz de covarianzas empírica de los datos es
+\begin{equation}
+
+\mathbf{S} = \frac{1}{n-1} \sum_{i=1}^{n} \left( \mathbf{x}_{i\cdot} - \mathbf{\overline{x}} \right) \left( \mathbf{x}_{i\cdot} - \mathbf{\overline{x}} \right)^{\mathrm{T}}
+
+\end{equation}
+</p>
+<p>
+Esta matriz \( \mathbf{S} \) es una matriz simétrica y semidefinida positiva.
+</p>
+<p>
+En alguna ocasiones nos podemos encontrar que la matriz de covarianza empírica se calcula con un factor \( \frac{1}{n} \) en lugar de \( \frac{1}{n-1} \). Cuando se hace de esta manera, la matriz de covarianzas empírica es un estimador sesgado.
+</p>
+
+
+<!-- ######################################################## -->
+
+
+<!-- ######################################################## -->
+<h2>¿Qué es el análisis de componentes principales?</h2>
+<p>
+Dado una matriz de datos \( \mathbf{X} \) de \( n \) realizaciones por \( p \) variables, el análisis de componentes principales (PCA por las siglas en inglés de <i>Principal Component Analysis</i>) hace una reducción de dimensiones de la matriz de \( p \) variables a \( m \) variables. Esto se hace con el objetivo de tener una matriz de datos más pequeña manteniendo la información importante o para para poder hacer una visualización de las realizaciones (si \( m \) es igual a 2 o 3).   
+</p>
+<!-- ######################################################## -->
+
+
+<!-- ######################################################## -->
+<h2>Entendiendo PCA</h2>
+<p>
+Partimos de un conjunto de realizaciones \( \left\lbrace \mathbf{x}_{1\cdot}, \cdots, \mathbf{x}_{i\cdot}, \cdots, \mathbf{x}_{n\cdot} \right\rbrace \) con \( \mathbf{x}_{i\cdot}=\left\lbrack \begin{array}{c} x_{i1} \\ \vdots \\ x_{ij} \\ \vdots \\ x_{ip} \end{array}\right\rbrack \in \mathbb{R}^{p} \), y asumimos que los datos están centrados, es decir, que \( \mathbf{\overline{x}}=\left\lbrack \begin{array}{c} \overline{x}_{\cdot1} \\ \vdots \\ \overline{x}_{\cdot j} \\ \vdots \\ \overline{x}_{\cdot p} \end{array}\right\rbrack = \mathbf{0} \).
+</p>
+<p>  
+Como \( \mathbf{x}_{i\cdot} \in \mathbb{R}^{p} \), éste se puede poner como combinación lineal de vectores base. Por ejemplo, podríamos escribir \( \mathbf{x}_{i\cdot} \) como:
+\begin{equation}
+
+\mathbf{x}_{i\cdot}=x_{i1} \cdot {\left\lbrack \begin{array}{c} 1 \\ 0 \\ \vdots \\ 0 \end{array}\right\rbrack}_{p} + \cdots + x_{ip} \cdot {\left\lbrack \begin{array}{c} 0 \\ 0 \\ \vdots \\ 1 \end{array}\right\rbrack}_{p}
+
+\end{equation}
+</p>
+<p>
+El objetivo de PCA es encontrar un vector \( \widetilde{\mathbf{x}}_{i\cdot} \) los más similar a \( \mathbf{x}_{i\cdot} \) pero con menos dimensiones. Para ésto, primero tenemos que encontrar las bases apropiadas con sus coeficientes:
+\begin{equation}
+
+\mathbf{x}_{i\cdot} = \sum_{j=1}^{p} \beta_{ij} \mathbf{b}_{\cdot j}
+
+\end{equation}
+
+donde \( \mathbf{b}_{\cdot j} \in \mathbb{R}^{p} \) pertenece al conjunto de una base ortonormal \( \left\lbrace \mathbf{b}_{\cdot 1}, \cdots, \mathbf{b}_{\cdot j}, \cdots, \mathbf{b}_{\cdot p} \right\rbrace \). Al ser una base ortonormal se cumple que \( \| \mathbf{b}_{\cdot j} \|=1 \) y que \( \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{b}_{\cdot j'}= 1 \) si \( j=j' \) y \( \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{b}_{\cdot j'}= 0 \) si \( j \neq j' \).
+</p>
+<p>
+Recordemos también que la magnitud de la proyección de un vector \( \mathbf{x}_{i\cdot} \) sobre una base \( \mathbf{b}_{\cdot j} \in \mathbb{R}^{p} \) es:
+\begin{equation}
+
+\frac{\mathbf{x}_{i\cdot}^{\mathrm{T}} \mathbf{b}_{\cdot j}} {\| \mathbf{b_{\cdot j}} \|} = \mathbf{x}_{i \cdot}^{\mathrm{T}} \mathbf{b}_{\cdot j} = \beta_{ij} 
+
+\end{equation}
+</p>
+<p>
+Seguimos con el objetivo de reducir las dimensiones de \( \mathbf{x}_{i\cdot} \). Para ello, reescribimos la ecuación (7) de la siguiente forma:
+\begin{equation}
+
+\mathbf{x}_{i\cdot} = \sum_{j=1}^{m} \beta_{ij} \mathbf{b}_{\cdot j} + \sum_{j=m+1}^{p} \beta_{ij} \mathbf{b}_{\cdot j}
+
+\end{equation}
+</p>
+<p>
+De esta forma dividimos el espacio \( p \) en dos subespacios, \( m \) y \( p-m \). El primer subespacio \( m \) se denomina subespacio principal y el conjunto de sus vectores base \( \left\lbrace \mathbf{b}_{\cdot 1}, \cdots, \mathbf{b}_{\cdot j}, \cdots, \mathbf{b}_{\cdot m} \right\rbrace \) se denominan componentes principales. El segundo subespacio \( p-m \) es un subespacio complementario ortogonal del primero. En PCA el segundo espacio es ignorado y para representar \( \widetilde{\mathbf{x}}_{i\cdot} \) sólo se utiliza el primero:
+\begin{equation}
+
+\widetilde{\mathbf{x}}_{i\cdot} = \sum_{j=1}^{m} \beta_{ij} \mathbf{b}_{\cdot j}
+
+\end{equation}
+</p>
+<p>
+Aunque el vector \( \widetilde{\mathbf{x}}_{i\cdot} \) sigue viviendo en \( \mathbb{R}^{p} \), se puede representar en \( \mathbb{R}^{m} \) utilizando solamente sus coeficientes:
+\begin{equation}
+
+\widetilde{\mathbf{x}}_{i\cdot}=\left\lbrack \begin{array}{c}
+\beta_{i1} \\
+\vdots \\
+\beta_{ij} \\
+\vdots \\
+\beta_{im} 
+\end{array}\right\rbrack \in \mathbb{R}^{m}
+
+\end{equation}     
+</p>
+<!-- ######################################################## -->
+
+
+<!-- ######################################################## -->
+<h2>Resolviendo PCA</h2>
+<p> 
+Pero, ¿cómo encontramos los coeficientes \( \beta_{ij} \) para representar \( \widetilde{\mathbf{x}}_{i \cdot} \) como en la ecuación (11)?     
+</p>
+<p>
+Para ello, recordemos que \( \widetilde{\mathbf{x}}_{i\cdot} \) tiene que ser lo más parecido posible a \( \mathbf{x}_{i\cdot} \). Con esto, para todos los vectores \( \left\lbrace \mathbf{x}_{1\cdot}, \cdots, \mathbf{x}_{i\cdot}, \cdots, \mathbf{x}_{n\cdot} \right\rbrace \) podemos definir una función que mida cómo de parecedidos son con respecto a sus representaciones \( \left\lbrace \widetilde{\mathbf{x}}_{1\cdot}, \cdots, \widetilde{\mathbf{x}}_{i\cdot}, \cdots, \widetilde{\mathbf{x}}_{n\cdot} \right\rbrace \):
+\begin{equation}
+
+J = \frac {1}{n} \sum_{i=1}^{n} \left\| \mathbf{x}_{i \cdot} - \widetilde{\mathbf{x}}_{i \cdot} \right\|^{2}
+
+\end{equation}
+</p>
+<p>
+Podemos desarrollar la función \( J \) con los siguientes dos pasos
+\begin{equation}
+\begin{split}
+
+\mathbf{x}_{i \cdot} - \mathbf{\tilde x}_{i \cdot} = \left( \sum_{j=1}^{m} \beta_{ij} \mathbf{b}_{\cdot j} + \sum_{j=m+1}^{p} \beta_{ij} \mathbf{b}_{\cdot j} \right) -  \left( \sum_{j=1}^{m} \beta_{ij} \mathbf{b}_{\cdot j} \right) = \\
+= \sum_{j=m+1}^{p} \beta_{ij} \mathbf{b}_{\cdot j} = \sum_{j=m+1}^{p} \left( \mathbf{x}_{i}^{\mathrm{T}} \mathbf{b}_{\cdot j} \right) \mathbf{b}_{\cdot j} = \sum_{j=m+1}^{p} \left( \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{x}_{i} \right) \mathbf{b}_{\cdot j}
+
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+
+J = \frac {1}{n} \sum_{i=1}^{n} \left\| \mathbf{x}_{i \cdot} - \widetilde{\mathbf{x}}_{i \cdot} \right\|^{2} = \\ 
+= \frac {1}{n} \sum_{i=1}^{n} \left\| \sum_{j=m+1}^{p} \left( \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{x}_{i \cdot} \right) \mathbf{b}_{\cdot j} \right\|^{2} = \\
+= \frac {1}{N} \sum_{i=1}^{n} \sum_{j=m+1}^{p} \left( \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{x}_{i \cdot} \right)^{2} = \\
+= \frac {1}{n} \sum_{i=1}^{n} \sum_{j=m+1}^{p} \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{x}_{i \cdot} \mathbf{x}_{i \cdot}^{\mathrm{T}} \mathbf{b}_{\cdot j} = \\
+= \sum_{j=m+1}^{p} \mathbf{b}_{\cdot j}^{\mathrm{T}} \left( \frac {1}{n} \sum_{i=1}^{n} \mathbf{x}_{i \cdot} \mathbf{x}_{i \cdot}^{\top} \right) \mathbf{b}_{\cdot j}
+
+\end{split}
+\end{equation}
+</p>
+<p>
+Nos encontramos aquí que \( \frac{1}{n} \sum_{i=1}^{n} \mathbf{x}_{i\cdot} \mathbf{x}_{i\cdot}^{\mathrm{T}} \) es la matriz de covarianzas empírica \( \mathbf{S} \) sesgada con los datos centrados, es decir, con \( \mathbf{\overline{x}}= \mathbf{0} \). Por tanto, tenemos que
+\begin{equation}
+
+J = \sum_{j=m+1}^{p} \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{S} \mathbf{b}_{\cdot j}
+
+\end{equation}
+</p>
+<p>
+Con la función \( J \) anterior, vamos a intentar encontrar los vectores base que la minimizan:
+\begin{equation}
+
+\min_{\mathbf{b}_{\cdot j}} J = \min_{\mathbf{b}_{\cdot j}} \sum_{j=m+1}^{p} \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{S} \mathbf{b}_{\cdot j} \;\; \textrm{sujeta a} \;\;  \left\| \mathbf{b}_{\cdot j} \right\|^{2} = \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{b}_{\cdot j} = 1
+
+\end{equation}
+</p>
+<p>
+Para resolver la ecuación (16) utilizamos los multiplicadores de Lagrange
+\begin{equation}
+
+\mathfrak{L} \left( \mathbf{b}_{\cdot j} , \lambda_{\cdot j} \right) = \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{S} \mathbf{b}_{\cdot j} + \lambda_{\cdot j} \left( 1 - \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{b}_{\cdot j} \right) \; \textrm{ with } \; j = m+1,\dots ,p
+
+\end{equation}
+
+\begin{equation}
+
+\frac{\partial \mathfrak{L}}{\partial \mathbf{b}_{\cdot j}} = 2 \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{S} - 2 \lambda_{\cdot j} \mathbf{b}_{\cdot j}^{\mathrm{T}} \; \textrm{ with } j = m+1,\dots, p
+
+\end{equation}
+</p>
+<p>
+Igualando a 0
+\begin{equation}
+\begin{split}
+
+\frac{\partial \mathfrak{L}}{\partial \mathbf{b}_{\cdot j}} = 0 \; \textrm{ with } i = m+1,\dots, p \\
+2 \mathbf{b}_{\cdot j}^{\mathrm{T}} \mathbf{S} - 2 \lambda_{\cdot j} \mathbf{b}_{\cdot j}^{\mathrm{T}} = 0 \; \textrm{ with } j = m+1,\dots, p \\
+
+\end{split}
+\end{equation}
+</p>
+<p>
+Da como resultado la relación
+\begin{equation}
+
+\mathbf{S} \mathbf{b}_{\cdot j} = \lambda_{\cdot j} \mathbf{b}_{\cdot j} \; \textrm{ with } j = m+1,\dots ,p 
+
+\end{equation}
+</p>
+<p>
+Comprobamos en la ecuación (20) que los vectores base \( \mathbf{b}_{\cdot j} \) con \( j = m+1, \dots, p \) son los autovectores de la matriz de covarianzas empírica \( \mathbf{S} \) sesgada con los datos centrados y que \( \lambda_{\cdot j} \) ,que son los multipliadores de Lagrange, son los autovalores correspondientes.    
+</p>
+<p>
+Por tanto, calculando los autovectores de la matriz de covarianzas empírica \( \mathbf{S} \) sesgada y eligiendo los que van desde \( m+1 \) a \( p \), encontramos los vectores base que minimizan la función \( J\), y que se corresponden con el subespacio complementario ortogonal. Esto quiere decir que los autovectores que van desde \( 1 \) a \( m \) son los vectores base del subespacio principal.
+</p>
+<p>
+Por tanto, calculando los autovectores de la matriz de covarianzas empírica \( \mathbf{S} \) sesgada y eligiendo los que van desde \( m+1 \) a \( p \), encontramos los vectores base que minimizan la función \( J\), y que se corresponden con el subespacio complementario ortogonal. Esto quiere decir que los autovectores que van desde \( 1 \) a \( m \) son los vectores base del subespacio principal, es decir, son los componentes principales. Con esto, encontramos el conjunto de los vectores base \( \left\lbrace \mathbf{b}_{\cdot 1}, \cdots, \mathbf{b}_{\cdot j}, \cdots, \mathbf{b}_{\cdot p} \right\rbrace \) que hacen que \( \widetilde{\mathbf{x}}_{i\cdot} \) sea lo más parecido posible a \( \mathbf{x}_{i\cdot} \).
+</p>
+<p>
+Una vez obtenidos los vectores base, podemos calcular los coeficientes \( \beta_{ij} \) simplemente aplicando la ecuación (8).
+</p>
+<!-- ######################################################## -->
+
+
+<!-- ######################################################## -->
+<h2>Cálculo de PCA con matriz de covarianzas insesgada</h2>
+<p>
+Los autovectores de una matriz cuadrada \( \mathbf{A} \) y los autovectores de esa misma matriz cuadrada \( \mathbf{A} \) multiplicada por un escalar son exactamente los mismos. Por tanto, para el cálculo de las componentes prinpales, da igual calcular los autovectores de la matriz de covarianza empírica con un factor \( \frac{1}{n} \) (sesgada) o con un factor \( \frac{1}{n-1} \) (insesgada). Sin embargo, los normal es que todas las librerías computacionales lo hagan con la matriz de covarianza empírica insesgada. 
+</p>
+<!-- ######################################################## -->
+
+
+<!-- ######################################################## -->
+<h2>¿Es necesario centrar los datos al hacer PCA?</h2>
+<p>
+Para encontrar las componentes principales de un conjunto de datos, calculamos los autovectores de la matriz de covarianza empírica \( \mathbf{S} \) (como hemos dicho, normalmente insesgada). Hasta ahora hemos supuesto que el conjunto de datos estaba centrado. Para centrar un conjunto de datos, lo que hacemos es \( \mathbf{x}_{i\cdot} = \mathbf{x}_{i\cdot}^{original} - \mathbf{\overline{x}}^{original} \) para cada \( i = 1,\dots ,n \). Con esto, media de los datos centrados es \( \mathbf{\overline{x}}= \mathbf{0} \). Calculando la matriz de covarianza empírica \( \mathbf{S} \), en este caso, insesgada, tenemos que
+\begin{equation}
+\begin{split}
+
+\mathbf{S} = \frac{1}{n-1} \sum_{i=1}^{n} \left( \mathbf{x}_{i\cdot} - \mathbf{\overline{x}} \right) \left( \mathbf{x}_{i\cdot} - \mathbf{\overline{x}} \right)^{\mathrm{T}} = \\
+= \frac{1}{n-1} \sum_{i=1}^{n} \left( \mathbf{x}_{i\cdot} - \mathbf{0} \right) \left( \mathbf{x}_{i\cdot} - \mathbf{0} \right)^{\mathrm{T}} = \\
+= \frac{1}{n-1} \sum_{i=1}^{n} \mathbf{x}_{i\cdot} \mathbf{x}_{i\cdot}^{\mathrm{T}} = \\
+= \frac{1}{n-1} \sum_{i=1}^{n} \left( \mathbf{x}_{i\cdot}^{original} - \mathbf{\overline{x}}^{original} \right) \left( \mathbf{x}_{i\cdot}^{original} - \mathbf{\overline{x}}^{original} \right)^{\mathrm{T}}
+
+\end{split}
+\end{equation}
+
+Comprobamos que es equivalente centrar los datos primero y luego calcular la matriz de covarianza empírica \( \mathbf{S} \) de los datos centrados, que calcular la matriz de covarianza empírica \( \mathbf{S} \) directamente de los datos no centrados. Por tanto, al ser \( \mathbf{S} \) igual, el cálculo de las componentes principales dará igual tanto si los datos están centrados como si no.
+\begin{equation} 
+</p>
+<!-- ######################################################## -->
+
+
+<!-- ######################################################## -->
+<h2>Usando descomposición en valores singulares en PCA</h2>
+<p>
+El teorema de descomposición en valores singulares (SVD por las siglas en inglés de <i>Singular Value Decomposition</i>) establece que cualquier matriz \( \mathbf{A} \) de \( n \) filas por \( p \) columnas se puede expresar como
+\begin{equation}
+
+\mathbf{A}_{n \times p} = \mathbf{U}_{n \times n} \mathbf{\Sigma}_{n \times p} \mathbf{V}^{\mathrm{T}}_{p \times p}
+
+\end{equation}
+
+Tanto \( \mathbf{U} \) como \( \mathbf{V} \) son matrices ortogonales, es decir, sus columnas son ortogonales entre sí, por lo que \( \mathbf{U}^{\mathrm{T}} \mathbf{U}=1 \) y \( \mathbf{V}^{\mathrm{T}} \mathbf{V}=1 \). La matriz \( \mathbf{\Sigma} \) es una matriz diagonal y sus elementos de la diagonal, que son valores positivos, se denominan valores singulares. A las columnas de la matriz \( \mathbf{U} \) se las denomina vectores singulares izquierdos y a las columnas de la matriz \( \mathbf{V} \) se las denomina vectores singulares derechos.     
+</p>
+<p>
+Los vectores singulares izquierdos (columnas de \( \mathbf{U} \) ) son los autovectores de la matriz \( \mathbf{A} \mathbf{A}^{\mathrm{T}} \), y los vectores singulares derechos (columnas de \( \mathbf{V} \) ) son los autovectores de la matriz  \( \mathbf{A}^{\mathrm{T}} \mathbf{A} \). Los valores singulares son la raiz cuadrada de los autovalores de las matrices \( \mathbf{A} \mathbf{A}^{\mathrm{T}} \) y \( \mathbf{A}^{\mathrm{T}} \mathbf{A} \).
+</p>
+<!-- ######################################################## -->
+
+</body>
+</html>
