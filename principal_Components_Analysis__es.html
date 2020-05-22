@@ -314,10 +314,26 @@ El teorema de descomposición en valores singulares (SVD por las siglas en ingl�
 
 \end{equation}
 
-Tanto \( \mathbf{U} \) como \( \mathbf{V} \) son matrices ortogonales, es decir, sus columnas son ortogonales entre sí, por lo que \( \mathbf{U}^{\mathrm{T}} \mathbf{U}=1 \) y \( \mathbf{V}^{\mathrm{T}} \mathbf{V}=1 \). La matriz \( \mathbf{\Sigma} \) es una matriz diagonal y sus elementos de la diagonal, que son valores positivos, se denominan valores singulares. A las columnas de la matriz \( \mathbf{U} \) se las denomina vectores singulares izquierdos y a las columnas de la matriz \( \mathbf{V} \) se las denomina vectores singulares derechos.     
+Tanto \( \mathbf{U} \) como \( \mathbf{V} \) son matrices ortogonales, es decir, sus columnas son ortogonales entre sí, por lo que \( \mathbf{U}^{\mathrm{T}} \mathbf{U}=\mathbf{I} \) y \( \mathbf{V}^{\mathrm{T}} \mathbf{V}=\mathbf{I} \). La matriz \( \mathbf{\Sigma} \) es una matriz diagonal y sus elementos de la diagonal, que son siempre valores reales positivos, se denominan valores singulares. A las columnas de la matriz \( \mathbf{U} \) se las denomina vectores singulares izquierdos y a las columnas de la matriz \( \mathbf{V} \) se las denomina vectores singulares derechos.     
 </p>
 <p>
-Los vectores singulares izquierdos (columnas de \( \mathbf{U} \) ) son los autovectores de la matriz \( \mathbf{A} \mathbf{A}^{\mathrm{T}} \), y los vectores singulares derechos (columnas de \( \mathbf{V} \) ) son los autovectores de la matriz  \( \mathbf{A}^{\mathrm{T}} \mathbf{A} \). Los valores singulares son la raiz cuadrada de los autovalores de las matrices \( \mathbf{A} \mathbf{A}^{\mathrm{T}} \) y \( \mathbf{A}^{\mathrm{T}} \mathbf{A} \).
+Los vectores singulares izquierdos (columnas de \( \mathbf{U} \)) son los autovectores de la matriz \( \mathbf{A} \mathbf{A}^{\mathrm{T}} \), y los vectores singulares derechos (columnas de \( \mathbf{V} \)) son los autovectores de la matriz  \( \mathbf{A}^{\mathrm{T}} \mathbf{A} \). Los valores singulares son la raiz cuadrada de los autovalores de las matrices \( \mathbf{A} \mathbf{A}^{\mathrm{T}} \) y \( \mathbf{A}^{\mathrm{T}} \mathbf{A} \).
+</p>
+<p>
+Nos centramos en la característica de SVD de calcular los autovectores de la matriz \( \mathbf{A}^{\mathrm{T}} \mathbf{A} \), es decir, en los valores singulares derechos.
+</p> 
+<p>
+En nuestro caso, si el conjunto de datos \( X \) es centrado, tenemos que 
+\begin{equation}
+
+\mathbf{X}^{\mathrm{T}} \mathbf{X} = \sum_{i=1}^{n} \mathbf{x}_{i\cdot} \mathbf{x}_{i\cdot}^{\mathrm{T}} 
+
+\end{equation}
+
+es la matriz de covarianza empírica \( \mathbf{S} \) sin el factor \( \frac{1}{n-1} \) (o \( \frac{1}{n} \)). Y como hemos visto, los autovectores de una matriz son los mismos independientemente de si se multiplica por un escalar o no.
+</p>
+<p>
+Por tanto, si centramos los datos y calculamos el SVD, los vectores singulares derechos serán los autovectores de la matriz de covarianza empírica.
 </p>
 <!-- ######################################################## -->
 
